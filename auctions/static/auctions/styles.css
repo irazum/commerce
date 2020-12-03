@@ -1,0 +1,17 @@
+body {
+    padding: 10px;
+}
+
+
+textarea {
+    height: 30vh;
+}
+
+textarea, .right-div {
+    width: 40%;
+}
+
+.right-div {
+    margin-bottom: 20px;
+    text-align: right;
+}
