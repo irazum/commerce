@@ -10,7 +10,18 @@ categories = ['other', 'Fashion', 'Toys', 'Electronics', 'Home']
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    # make list of list of need data
+    listings_data = list()
+    for listing in Listings.objects.all():
+        listings_data.append([
+            listing.picture,
+            listing.title,
+            max(Bids.objects.filter(listing=listing).values_list('cost', flat=True)),
+            listing.description
+        ])
+    return render(request, "auctions/index.html", {
+        'listings_data': listings_data
+    })
 
 
 def login_view(request):
@@ -65,29 +76,22 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+def listing(request):
+    pass
+
+
 def create_listing(request):
     if request.method == "POST":
-        # записать данные в таблицу listings
-        # перенаправить на страницу созданного listing-элемента
-        l = Listings(
+        # записать данные в таблицы listings и bids
+        listing = Listings(
             title=request.POST.get("title"),
             description=request.POST.get("description"),
             picture=request.POST.get("pic_url"),
             seller=request.user
         )
-        l.save()
-        # пробуем создать новую ставку
-        try:
-            b = Bids(cost=request.POST.get("start_cost"))
-            b.save()
-        # если ставка с таким значением уже существует
-        except IntegrityError:
-            b = Bids.objects.filter(cost=request.POST.get("start_cost")).first()
-            print(b)
-        finally:
-            b.users.add(request.user)
-            b.listings.add(l)
-
+        listing.save()
+        Bids(cost=request.POST.get("start_cost"), user=request.user, listing=listing).save()
+        # ! редактировать: перенаправить на страницу созданного listing-элемента
         return HttpResponseRedirect(reverse("index"))
 
     if request.user.is_authenticated:

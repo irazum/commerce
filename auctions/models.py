@@ -16,7 +16,6 @@ class Categories(models.Model):
 class Listings(models.Model):
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=10000)
-    # cost = models.IntegerField()
     picture = models.URLField()
     category = models.ForeignKey(
         Categories,
@@ -24,7 +23,6 @@ class Listings(models.Model):
         related_name="categories",
         default=1
     )
-    # смысл в том, что seller должен ссылать на зарегистрированного юзера
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
 
     def __str__(self):
@@ -41,9 +39,9 @@ class Comments(models.Model):
 
 
 class Bids(models.Model):
-    cost = models.IntegerField(unique=True)
-    users = models.ManyToManyField(User, related_name="bids_users")
-    listings = models.ManyToManyField(Listings, related_name="bids_listings")
+    cost = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bids_user")
+    listing = models.ForeignKey(Listings, on_delete=models.CASCADE, related_name="bids_listing")
 
     def __str__(self):
-        return f'cost: {self.cost}\nusers: {self.users}\nlistings: {self.listings}'
+        return f'cost: {self.cost}\nusers: {self.user}\nlistings: {self.listing}'
