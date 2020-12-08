@@ -25,6 +25,11 @@ textarea, .right-div {
     height: 200px;
 }
 
+.image-flex-container{
+    display: flex;
+    justify-content: center;
+}
+
 .flex-container > div > img{
     width: 100%;
 }

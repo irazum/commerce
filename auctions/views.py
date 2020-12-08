@@ -17,7 +17,8 @@ def index(request):
             listing.picture,
             listing.title,
             max(Bids.objects.filter(listing=listing).values_list('cost', flat=True)),
-            listing.description
+            listing.description,
+            listing.pk
         ])
     return render(request, "auctions/index.html", {
         'listings_data': listings_data
@@ -76,10 +77,6 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
-def listing(request):
-    pass
-
-
 def create_listing(request):
     if request.method == "POST":
         # записать данные в таблицы listings и bids
@@ -101,3 +98,15 @@ def create_listing(request):
 
     else:
         return HttpResponseRedirect(reverse("login"))
+
+
+def listing(request, id):
+    listing = Listings.objects.get(id=id)
+    bids = Bids.objects.filter(listing=listing).values('cost', 'user')
+    for dct in bids:
+        dct['user'] = User.objects.get(id=dct['user']).username
+
+    return render(request, "auctions/listing.html", {
+        'listing': listing,
+        'bids': bids
+    })

@@ -6,7 +6,7 @@
     <h2>Active Listings</h2>
     {% for data in listings_data %}
         <div class="flex-container">
-            <div style="display:flex; justify-content:center;">
+            <div class="image-flex-container">
                 {% if data.0 %}
                     <img src="{{ data.0 }}" alt="Something is wrong" >
                 {% else %}
@@ -15,7 +15,7 @@
             </div>
             <div>
                 <h3>
-                    <a href="">{{ data.1 }}</a>
+                    <a href="{% url 'listing' data.4 %}">{{ data.1 }}</a>
                 </h3>
                 <div>
                     <strong>Current price:</strong>${{ data.2 }}

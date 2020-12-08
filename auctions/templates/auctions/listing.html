@@ -1,0 +1,21 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <h2>{{ listing.title }}</h2>
+            <div>
+                {% if listing.picture %}
+                    <img src="{{ listing.picture }}" alt="Something is wrong" style="height:250px;" >
+                {% else %}
+                    <img src="{% static 'auctions/no_image.jpg' %}" alt="Something is wrong" style="height:100px;">
+                {% endif %}
+            </div>
+            <div>
+                <div>
+                    <strong>Current price:</strong>${{ bids.0.cost }}
+                </div>
+                <div>{{ listing.description }}</div>
+            </div>
+        </div>
+
+{% endblock %}
