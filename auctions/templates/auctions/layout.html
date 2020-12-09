@@ -24,11 +24,20 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                 </li>
-
-                <li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'create-listing' %}">Create listing</a>
                 </li>
 
+                <li class="nav-item">
+                <!--just for space-->
+                    <a class="nav-link" style="width:55vw;"></a>
+                </li>
+                <li class="nav-item">
+                     <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+                </li>
+                <li class="nav-item">
+                     <a class="nav-link" href="{% url 'watchlist' %}">Win list</a>
+                </li>
             {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'login' %}">Log In</a>
@@ -38,6 +47,7 @@
                 </li>
             {% endif %}
         </ul>
+
         <hr>
         {% block body %}
         {% endblock %}

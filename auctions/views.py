@@ -106,7 +106,76 @@ def listing(request, id):
     for dct in bids:
         dct['user'] = User.objects.get(id=dct['user']).username
 
+    # POST handler
+    if request.method == "POST":
+        bid = request.POST.get('bid')
+        comment = request.POST.get('comment')
+        if bid:
+            # bid handler
+            if request.user == listing.seller:
+                message = "Error! You are the creator of this listing. You can't bid!"
+                return HttpResponseRedirect(f"{reverse('listing', kwargs={'id': id})}?message={message}")
+            else:
+                bid = int(bid)
+                max_bid = max(i['cost'] for i in bids)
+                if bid > max_bid or (len(bids) == 1 and bid >= max_bid):
+                    Bids(cost=bid, user=request.user, listing=listing).save()
+                    return HttpResponseRedirect(reverse('listing', kwargs={'id': id}))
+                else:
+                    message = 'Error. You should put the bid more than a previous bid!'
+                    response = HttpResponseRedirect(f"{reverse('listing', kwargs={'id': id})}?message={message}")
+                    return response
+        elif comment:
+            # comment handler
+            Comments(comment=comment, user=request.user, listing=listing).save()
+            return HttpResponseRedirect(reverse('listing', kwargs={'id': id}))
+
+    # GET handler
+    message = request.GET.get('message', '')
+    watchlist = request.GET.get('watchlist')
+    # watchlist handler
+    if watchlist:
+        watchlist = int(watchlist)
+        if watchlist:
+            listing.watchlist.add(request.user)
+        else:
+            listing.watchlist.remove(request.user)
+        return HttpResponseRedirect(reverse('listing', kwargs={'id': id}))
+    # message handler
+    elif message:
+        pass
+    else:
+        message = f'{len(bids)} bid(s) so far. '
+        if request.user == listing.seller:
+            message += "You are the creator of this listing"
+        elif request.user.username == bids[len(bids)-1]['user']:
+            message += "Your bid is the current bid"
+        else:
+            message += "You can place a bid more than current value or current value if it is 1 bid yet"
+
+    # GET request
     return render(request, "auctions/listing.html", {
         'listing': listing,
-        'bids': bids
+        'bids': bids,
+        'comments': Comments.objects.filter(listing=listing),
+        'message': message,
+        'watchlist_users': listing.watchlist.all()
+    })
+
+
+
+
+def watchlist(request):
+    # make list of list of need data of watched listings for this user
+    listings_data = list()
+    for listing in Listings.objects.filter(watchlist=request.user):
+        listings_data.append([
+            listing.picture,
+            listing.title,
+            max(Bids.objects.filter(listing=listing).values_list('cost', flat=True)),
+            listing.description,
+            listing.pk
+        ])
+    return render(request, "auctions/index.html", {
+        'listings_data': listings_data
     })

@@ -3,19 +3,65 @@
 
 {% block body %}
     <h2>{{ listing.title }}</h2>
+    <div class="flex-container" style="border: none">
+        <div class="image-flex-container" style="width:500px;">
+            {% if listing.picture %}
+                <img src="{{ listing.picture }}" alt="Something is wrong">
+            {% else %}
+                <img src="{% static 'auctions/no_image.jpg' %}" alt="Something is wrong">
+            {% endif %}
+        </div>
+        <div style="margin-left:100px;">
             <div>
-                {% if listing.picture %}
-                    <img src="{{ listing.picture }}" alt="Something is wrong" style="height:250px;" >
+                <strong>$</strong>&nbsp;{{ bids.last.cost }}
+            </div>
+            <div style="font-size:14px;">
+                {{ message }}
+            </div>
+            <form action="{% url 'listing' id=listing.pk %}" method="post">
+                {% csrf_token %}
+                <input required class="navy-input" type="number" placeholder="bid" name="bid" style="width: 100%;">
+                <div style="display:flex; justify-content:flex-end; margin-top:10px; ">
+                    <input class="btn btn-primary btn-sm" type="submit" value="Place bid">
+                </div>
+            </form>
+
+            <div style="font-size:15px;">
+                {% if not request.user in watchlist_users %}
+                    <br><a href="{% url 'listing' listing.id %}?watchlist=1">add in watchlist</a>
                 {% else %}
-                    <img src="{% static 'auctions/no_image.jpg' %}" alt="Something is wrong" style="height:100px;">
+                    <br><a href="{% url 'listing' listing.id %}?watchlist=0">delete from watchlist</a>
                 {% endif %}
             </div>
-            <div>
-                <div>
-                    <strong>Current price:</strong>${{ bids.0.cost }}
-                </div>
-                <div>{{ listing.description }}</div>
-            </div>
+
         </div>
+    </div>
+    <div>{{ listing.description }}</div>
+
+    <br><h3>Details:</h3>
+    <ul>
+        <li>Listed by:&nbsp; {{listing.seller}}</li>
+        <li>Category:&nbsp; {{listing.category}}</li>
+    </ul>
+
+    <br><br><h3>Comments:</h3>
+    {% for comment in comments %}
+        <div class="comment">
+            <h5>user: {{ comment.user }}</h5>
+            {{ comment.comment }}
+        </div>
+    {% endfor %}
+    <form action="{% url 'listing' id=listing.pk %}" method="post">
+        {% csrf_token %}
+        <div>
+            <h4><br>Write comment:</h4>
+        </div>
+        <div>
+            <textarea required class="navy-input" name="comment" placeholder="comment"></textarea>
+        </div>
+        <div class="right-div">
+            <input type="submit" value="submit" class="btn btn-primary">
+        </div>
+    </form>
 
 {% endblock %}

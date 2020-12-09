@@ -8,21 +8,27 @@ textarea {
 }
 
 textarea, .right-div {
-    width: 40%;
+    width: 500px;
 }
+
+.right-div {
+    display: flex;
+    justify-content: flex-end;
+}
+
 
 /* flex */
 .flex-container {
     display: flex;
     flex-wrap: wrap;
-    border: 1px solid grey;
     margin-bottom: 5px;
+    border: 1px solid grey;
 }
 
 .flex-container > div{
     padding: 5px;
     width: 300px;
-    height: 200px;
+
 }
 
 .image-flex-container{
@@ -37,4 +43,26 @@ textarea, .right-div {
 
 .flex-container a{
     color: black;
+}
+
+.comment {
+    border: 1px solid silver;
+    margin: 10px;
+    padding: 5px;
+    width: 500px;
+    word-wrap: break-word;
+}
+
+
+:active, :hover, :focus {
+    outline: none;
+    outline-offset: 0;
+}
+
+.navy-input {
+    border-radius: 5px;
+	border:1px solid navy;
+}
+.navy-input:hover {
+    border:2px solid blue;
 }
