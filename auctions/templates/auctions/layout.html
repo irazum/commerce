@@ -22,6 +22,9 @@
             </li>
             {% if user.is_authenticated %}
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'categories' %}">Categories</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                 </li>
                 <li class="nav-item">
@@ -30,13 +33,13 @@
 
                 <li class="nav-item">
                 <!--just for space-->
-                    <a class="nav-link" style="width:55vw;"></a>
+                    <a class="nav-link" style="width:45vw;"></a>
                 </li>
                 <li class="nav-item">
-                     <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+                     <a class="nav-link" href="{% url 'index' %}?watchlist=1">Watchlist</a>
                 </li>
                 <li class="nav-item">
-                     <a class="nav-link" href="{% url 'watchlist' %}">Win list</a>
+                     <a class="nav-link" href="{% url 'index' %}?winlist=1">Win list</a>
                 </li>
             {% else %}
                 <li class="nav-item">

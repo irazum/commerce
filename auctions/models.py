@@ -23,6 +23,7 @@ class Listings(models.Model):
         related_name="categories",
         default=1
     )
+    status = models.BooleanField(default=True)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
     watchlist = models.ManyToManyField(User, blank=True, related_name="l_watchlist")
 

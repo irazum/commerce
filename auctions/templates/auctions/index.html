@@ -3,26 +3,25 @@
 
 
 {% block body %}
-    <h2>Active Listings</h2>
+    <h2>{{ title }}</h2>
     {% for data in listings_data %}
         <div class="flex-container">
             <div class="image-flex-container">
-                {% if data.0 %}
-                    <img src="{{ data.0 }}" alt="Something is wrong" >
+                {% if data.listing.picture %}
+                    <img src="{{ data.listing.picture }}" alt="Something is wrong" >
                 {% else %}
                     <img src="{% static 'auctions/no_image.jpg' %}" alt="Something is wrong">
                 {% endif %}
             </div>
             <div>
                 <h3>
-                    <a href="{% url 'listing' data.4 %}">{{ data.1 }}</a>
+                    <a href="{% url 'listing' data.listing.pk %}">{{ data.listing.title }}</a>
                 </h3>
                 <div>
-                    <strong>Current price:</strong>${{ data.2 }}
+                    <strong>Current price:</strong>${{ data.max_bid }}
                 </div>
-                <div>{{ data.3 }}</div>
+                <div>{{ data.listing.description }}</div>
             </div>
         </div>
     {% endfor %}
-
 {% endblock %}

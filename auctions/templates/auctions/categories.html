@@ -1,0 +1,11 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <ul style="display:flex; flex-flow: row wrap;">
+    {% for category in categories|slice:"::-1" %}
+        <h4 style="margin:20px; padding:5px;">
+            <a href="{% url 'index' %}?category={{ category.category }}" style="color:DimGray;">{{ category.category }}</a>
+        </h4>
+    {% endfor %}
+    </ul>
+{% endblock %}

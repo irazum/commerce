@@ -6,22 +6,44 @@ from django.urls import reverse
 
 from .models import *
 
-categories = ['other', 'Fashion', 'Toys', 'Electronics', 'Home']
-
 
 def index(request):
-    # make list of list of need data
-    listings_data = list()
-    for listing in Listings.objects.all():
-        listings_data.append([
-            listing.picture,
-            listing.title,
-            max(Bids.objects.filter(listing=listing).values_list('cost', flat=True)),
-            listing.description,
-            listing.pk
-        ])
+    # for winlist
+    if request.GET.get('winlist'):
+        title = 'Win List'
+        listings_data = list()
+        for listing in Listings.objects.filter(status=False):
+            bid = Bids.objects.filter(listing=listing).last()
+            if request.user == bid.user:
+                listings_data.append({
+                    'listing': listing,
+                    'max_bid': bid.cost
+                })
+    # for watchlist, categorylist and activelist
+    else:
+        if request.GET.get('watchlist'):
+            title = 'Watchlist'
+            kwargs = {'watchlist': request.user}
+        elif request.GET.get('category'):
+            title = request.GET.get('category')
+            kwargs = {
+                'category': Categories.objects.get(category=title),
+                'status': True
+            }
+        else:
+            title = 'Active Listings'
+            kwargs = {"status": True}
+
+        # make list of dicts of need data
+        listings_data = list()
+        for listing in Listings.objects.filter(**kwargs):
+            listings_data.append({
+                'listing': listing,
+                'max_bid': max(Bids.objects.filter(listing=listing).values_list('cost', flat=True))
+            })
     return render(request, "auctions/index.html", {
-        'listings_data': listings_data
+        'listings_data': listings_data,
+        'title': title
     })
 
 
@@ -84,7 +106,8 @@ def create_listing(request):
             title=request.POST.get("title"),
             description=request.POST.get("description"),
             picture=request.POST.get("pic_url"),
-            seller=request.user
+            seller=request.user,
+            category=Categories.objects.get(category=request.POST.get("category"))
         )
         listing.save()
         Bids(cost=request.POST.get("start_cost"), user=request.user, listing=listing).save()
@@ -102,9 +125,7 @@ def create_listing(request):
 
 def listing(request, id):
     listing = Listings.objects.get(id=id)
-    bids = Bids.objects.filter(listing=listing).values('cost', 'user')
-    for dct in bids:
-        dct['user'] = User.objects.get(id=dct['user']).username
+    bids = Bids.objects.filter(listing=listing)
 
     # POST handler
     if request.method == "POST":
@@ -117,7 +138,7 @@ def listing(request, id):
                 return HttpResponseRedirect(f"{reverse('listing', kwargs={'id': id})}?message={message}")
             else:
                 bid = int(bid)
-                max_bid = max(i['cost'] for i in bids)
+                max_bid = max(i.cost for i in bids)
                 if bid > max_bid or (len(bids) == 1 and bid >= max_bid):
                     Bids(cost=bid, user=request.user, listing=listing).save()
                     return HttpResponseRedirect(reverse('listing', kwargs={'id': id}))
@@ -133,13 +154,19 @@ def listing(request, id):
     # GET handler
     message = request.GET.get('message', '')
     watchlist = request.GET.get('watchlist')
+    close = request.GET.get('close')
     # watchlist handler
     if watchlist:
         watchlist = int(watchlist)
-        if watchlist:
+        if watchlist == 1:
             listing.watchlist.add(request.user)
         else:
             listing.watchlist.remove(request.user)
+        return HttpResponseRedirect(reverse('listing', kwargs={'id': id}))
+    # listing status handler
+    elif close:
+        listing.status = False
+        listing.save()
         return HttpResponseRedirect(reverse('listing', kwargs={'id': id}))
     # message handler
     elif message:
@@ -148,7 +175,7 @@ def listing(request, id):
         message = f'{len(bids)} bid(s) so far. '
         if request.user == listing.seller:
             message += "You are the creator of this listing"
-        elif request.user.username == bids[len(bids)-1]['user']:
+        elif request.user == bids[len(bids)-1].user:
             message += "Your bid is the current bid"
         else:
             message += "You can place a bid more than current value or current value if it is 1 bid yet"
@@ -163,19 +190,8 @@ def listing(request, id):
     })
 
 
-
-
-def watchlist(request):
-    # make list of list of need data of watched listings for this user
-    listings_data = list()
-    for listing in Listings.objects.filter(watchlist=request.user):
-        listings_data.append([
-            listing.picture,
-            listing.title,
-            max(Bids.objects.filter(listing=listing).values_list('cost', flat=True)),
-            listing.description,
-            listing.pk
-        ])
-    return render(request, "auctions/index.html", {
-        'listings_data': listings_data
+def categories(request):
+    return render(request, "auctions/categories.html", {
+        "categories": Categories.objects.all()
     })
+
