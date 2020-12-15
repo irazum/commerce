@@ -9,16 +9,16 @@
     <form action="{% url 'create-listing' %}" method="post">
         {% csrf_token %}
         <div>
-            <input required name="title" type="text" placeholder="Title">
+            <input required name="title" type="text" maxlength="50" placeholder="Title">
         </div>
         <div>
-            <textarea required name="description" placeholder="Description"></textarea>
+            <textarea required name="description" maxlength="1000" placeholder="Description"></textarea>
         </div>
         <div>
-            <input required name="start_cost" type="number" placeholder="Start cost">
+            <input required name="start_cost" type="number" min="0" max="999999999" placeholder="Start cost">
         </div>
         <div>
-            <input name="pic_url" type="url" placeholder="picture">
+            <input name="pic_url" type="url" maxlength="250" placeholder="picture url">
         </div>
         <div>
             <select name="category">

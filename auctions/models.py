@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.html import format_html
 
 
 class User(AbstractUser):
@@ -14,8 +15,8 @@ class Categories(models.Model):
 
 
 class Listings(models.Model):
-    title = models.CharField(max_length=64)
-    description = models.CharField(max_length=10000)
+    title = models.CharField(max_length=50)
+    description = models.TextField(max_length=1000)
     picture = models.URLField()
     category = models.ForeignKey(
         Categories,
@@ -28,16 +29,25 @@ class Listings(models.Model):
     watchlist = models.ManyToManyField(User, blank=True, related_name="l_watchlist")
 
     def __str__(self):
-        return f"{self.title}"
+        return f"{self.pk ,self.title}"
 
 
 class Comments(models.Model):
-    comment = models.CharField(max_length=1000)
+    comment = models.TextField(max_length=2000)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments_user")
     listing = models.ForeignKey(Listings, on_delete=models.CASCADE, related_name="comments_listing")
 
     def __str__(self):
         return f"{self.comment}\nfrom user: {self.user}"
+
+    # change view of the comments in admin if it turn on
+    def comment_view(self):
+        return format_html(
+            '<div style="width:300px; word-wrap:break-word;">{}</div>',
+            self.comment
+        )
+    # for save the ability to sort the column
+    comment_view.admin_order_field = 'comment'
 
 
 class Bids(models.Model):

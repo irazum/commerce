@@ -33,13 +33,16 @@
 
                 <li class="nav-item">
                 <!--just for space-->
-                    <a class="nav-link" style="width:45vw;"></a>
+                    <a class="nav-link" style="width:35vw;"></a>
                 </li>
                 <li class="nav-item">
-                     <a class="nav-link" href="{% url 'index' %}?watchlist=1">Watchlist</a>
+                     <a class="nav-link" href="{% url 'index' %}?watchlist=1">WatchList</a>
                 </li>
                 <li class="nav-item">
-                     <a class="nav-link" href="{% url 'index' %}?winlist=1">Win list</a>
+                    <a class="nav-link" href="{% url 'index' %}?mylist=1">MyList</a>
+                </li>
+                <li class="nav-item">
+                     <a class="nav-link" href="{% url 'index' %}?winlist=1">WinList</a>
                 </li>
             {% else %}
                 <li class="nav-item">

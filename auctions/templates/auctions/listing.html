@@ -12,29 +12,47 @@
             {% endif %}
         </div>
         <div style="margin-left:100px;">
-            <!-- active auction or not-->
+            <!-- active auction-->
             {% if listing.status %}
-            <div>
-                <strong>$</strong>&nbsp;{{ bids.last.cost }}
-            </div>
-            <div style="font-size:14px;">
-                {{ message }}
-            </div>
-
-            {% if request.user != listing.seller %}
-                <form action="{% url 'listing' id=listing.pk %}" method="post">
-                    {% csrf_token %}
-                    <input required class="navy-input" type="number" placeholder="bid" name="bid" style="width: 100%;">
-                    <div style="display:flex; justify-content:flex-end; margin-top:10px; ">
-                        <input class="btn btn-primary btn-sm"  type="submit" value="Place bid">
-                    </div>
-                </form>
-            {% else %}
                 <div>
-                    <a class="btn btn-primary" style="color:white;" href="{% url 'listing' id=listing.pk %}?close=1">Close the auction</a>
+                    <strong>$</strong>&nbsp;{{ bids.last.cost }}
                 </div>
-            {% endif %}
+                <div style="font-size:14px;">
+                    {{ message }}
+                </div>
 
+                {% if request.user != listing.seller %}
+                    <form action="{% url 'listing' id=listing.pk %}" method="post">
+                        {% csrf_token %}
+                        <input required class="navy-input" type="number" step="1" max="999999999" placeholder="bid" name="bid" style="width: 100%;">
+                        <div style="display:flex; justify-content:flex-end; margin-top:10px; ">
+                            <input class="btn btn-primary btn-sm"  type="submit" value="Place bid">
+                        </div>
+                    </form>
+                {% else %}
+                    <div>
+                        <a class="btn btn-primary" style="color:white;" href="{% url 'listing' id=listing.pk %}?close=1">Close the auction</a>
+                    </div>
+                    <div>
+                        <br><a class="btn btn-outline-danger btn-sm" href="{% url 'listing' id=listing.pk %}?delete=1">Delete auction</a>
+                    </div>
+                {% endif %}
+            <!--not active auction-->
+            {% else %}
+                <h4>Auction finished!</h4>
+                <!-- individual message for winner -->
+                {% if request.user != bids.last.user %}
+                    <div>
+                        Last bid: <strong>{{ bids.last.cost }}$ </strong>
+                    </div>
+                    <div>
+                        Won by: {{ bids.last.user.username }}
+                    </div>
+                {% else %}
+                    Congratulations! You won this auction. Winning bid is <strong>{{ bids.last.cost }}$</strong>
+                {% endif %}
+            {% endif %}
+            <!--add (delete) in (from) watchlist button-->
             <div style="font-size:15px;">
                 {% if not request.user in watchlist_users %}
                     <br><a href="{% url 'listing' listing.id %}?watchlist=1">add in watchlist</a>
@@ -42,24 +60,8 @@
                     <br><a href="{% url 'listing' listing.id %}?watchlist=0">delete from watchlist</a>
                 {% endif %}
             </div>
-        {% else %}
-            <h4>Auction finished!</h4>
-            <!-- individual message for winner -->
-            {% if request.user != bids.last.user %}
-                <div>
-                    Last bid: <strong>{{ bids.last.cost }}$ </strong>
-                </div>
-                <div>
-                    Won by: {{ bids.last.user.username }}
-                </div>
-            {% else %}
-                Congratulations! You won this auction. Winning bid is <strong>{{ bids.last.cost }}$</strong>
-            {% endif %}
-        {% endif %}
         </div>
     </div>
-
-
 
     <div>{{ listing.description }}</div>
     <br><h3>Details:</h3>
@@ -81,7 +83,7 @@
             <h4><br>Write comment:</h4>
         </div>
         <div>
-            <textarea required class="navy-input" name="comment" placeholder="comment"></textarea>
+            <textarea required class="navy-input" name="comment" maxlength="2000" placeholder="comment"></textarea>
         </div>
         <div class="right-div">
             <input type="submit" value="submit" class="btn btn-primary">
