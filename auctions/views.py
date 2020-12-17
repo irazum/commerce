@@ -140,9 +140,12 @@ def create_listing(request):
 
 
 def listing(request, id):
-    listing = Listings.objects.get(id=id)
-    bids = Bids.objects.filter(listing=listing)
-
+    # check on not exist listing
+    try:
+        listing = Listings.objects.get(id=id)
+        bids = Bids.objects.filter(listing=listing)
+    except:
+        return HttpResponseRedirect(reverse('index'))
     # POST handler
     if request.method == "POST":
         bid = request.POST.get('bid')
@@ -178,7 +181,7 @@ def listing(request, id):
                 return HttpResponseRedirect(reverse('listing', kwargs={'id': id}))
             # comment handler
             Comments(comment=comment, user=request.user, listing=listing).save()
-            return HttpResponseRedirect(reverse('listing', kwargs={'id': id}))
+            return HttpResponseRedirect(f"{reverse('listing', kwargs={'id': id})}#bottom")
     # GET handler
     if request.user.is_authenticated:
         message = request.GET.get('message', '')

@@ -77,6 +77,7 @@
             {{ comment.comment }}
         </div>
     {% endfor %}
+    <a name="bottom"></a>
     <form action="{% url 'listing' id=listing.pk %}" method="post">
         {% csrf_token %}
         <div>
